@@ -141,7 +141,7 @@ pub fn literal<'a>(expected: &'a str) -> impl Parser<'a, ()> {
     }
 }
 
-pub fn split_at<'a>(pattern: &'a str) -> impl Parser<'a, &'a str> {
+pub fn split_until<'a>(pattern: &'a str) -> impl Parser<'a, &'a str> {
     move |input: &'a str| {
         let byte_id: usize;
 
@@ -151,6 +151,19 @@ pub fn split_at<'a>(pattern: &'a str) -> impl Parser<'a, &'a str> {
         }
 
         Ok((&input[byte_id..], &input[..byte_id]))
+    }
+}
+
+pub fn split_at<'a>(pattern: &'a str) -> impl Parser<'a, &'a str> {
+    move |input: &'a str| {
+        let byte_id: usize;
+
+        match input.find(pattern) {
+            Some(idx) => byte_id = idx,
+            None => return Err(input),
+        }
+
+        Ok((&input[byte_id + pattern.len()..], &input[..byte_id]))
     }
 }
 
